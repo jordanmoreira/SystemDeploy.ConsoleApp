@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace F3MDeploy
 {
@@ -42,12 +39,15 @@ namespace F3MDeploy
 
         static public int DisplayMenu()
         {
-            string startPath = @"";
-            string zipPath = @"";
-            string extractPath = @"";
-
             //Formating the date (case sensitive).
             string date = DateTime.Now.ToString("ddMMyyyy HHmmss");
+
+            string sourcePath = @"";
+            string sourceBckupPath = @"";
+            string destinationPath = @"";
+            string destinationBckupPath = @"";
+            string directoryPath = @"";
+            DirectoryInfo destinationFolder = new DirectoryInfo(@"C:\Deploy\destino");
 
             Console.WriteLine("Selecione a aplicação para efetuar o deploy:");
             Console.WriteLine();
@@ -58,22 +58,42 @@ namespace F3MDeploy
             var result = Console.ReadLine();
             if (result == "1")
             {
-                Console.WriteLine(" Efetuando o deploy do WTE");
+                Console.WriteLine("Efetuando o deploy do WTE");
 
-                startPath = @"C:\temp";
-                zipPath = @"C:\destinoTemp\teste.zip";
+                sourcePath = @"C:\Deploy\wtepub";
+                destinationPath = @"C:\Deploy\destino";
+                sourceBckupPath = @"C:\Deploy\bckupOrigem\WTE__DEPLOY__" + "[" + date + "]" + ".zip";
+                destinationBckupPath = @"C:\Deploy\bckupDestino\WTE__DEPLOY__d__" + "[" + date + "]" + ".zip";
 
-                //Creating the backup file of the source directory.
-                ZipFile.CreateFromDirectory(@"C:\temp", @"C:\sourceTempBackup\backup" + " " + date + ".zip");
+                //Verifying if the file exists and deleting it.
+                directoryPath = @"C:\Deploy\wtepub\tempPdf";
+                if (Directory.Exists(directoryPath))
+                    Directory.Delete(directoryPath);
+                directoryPath = @"C:\Deploy\wtepub\imagens";
+                if (Directory.Exists(directoryPath))
+                    Directory.Delete(directoryPath);
+                File.Delete(@"C:\Deploy\wtepub\web.config");
+
+                //Creating the backup file of the source directory and copying it to it's folder.
+                ZipFile.CreateFromDirectory(sourcePath, sourceBckupPath);
 
                 //Creating the backup file of the destination directory.
-                ZipFile.CreateFromDirectory(@"C:\temp", @"C:\destinationTempBackup\backup" + " " + date + ".zip");
+                ZipFile.CreateFromDirectory(destinationPath, destinationBckupPath);
 
-                //'Ziping' and copying the directory to the destination.
-                ZipFile.CreateFromDirectory(startPath, zipPath);
+                //Deleting the original files in destination folder.
+                foreach (FileInfo file in destinationFolder.GetFiles())
+                {
+                    file.Delete();
+                }
+                foreach (DirectoryInfo dir in destinationFolder.GetDirectories())
+                {
+                    dir.Delete(true);
+                }
 
                 //Extracting the .zip file archives inside destination.
-                ZipFile.ExtractToDirectory(startPath, zipPath);
+                ZipFile.ExtractToDirectory(sourceBckupPath, destinationPath);
+
+                Console.WriteLine("O deploy foi efetuado com sucesso.");
             }
 
             if (result == "2")
