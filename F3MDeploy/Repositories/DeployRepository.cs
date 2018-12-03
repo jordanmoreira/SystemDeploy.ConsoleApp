@@ -16,8 +16,6 @@ namespace F3MDeploy.Repositories
             string destinationPath = @"";
             string destinationBckupPath = @"";
             string directoryPath = @"";
-            //DirectoryInfo destinationFolder = new DirectoryInfo(@"C:\Deploy\destino");
-            //DirectoryInfo sourceFolder = new DirectoryInfo(@"C:\Deploy\wtepub");
             var spinner = new Spinner(10, 10);
 
             Console.Write("Efetuando o deploy do WTE...");
@@ -60,15 +58,19 @@ namespace F3MDeploy.Repositories
             //    dir.Delete(true);
             //}
 
-            //Copying and overwriting files to the destination folder.
-            //string[] directories = Directory.GetDirectories(sourcePath);
-            //foreach(string d in directories)
-            //{
-            //    Directory.
-            //}
+            //Now Create all of the directories
+            foreach (string dirPath in Directory.GetDirectories(sourcePath, "*",
+                SearchOption.AllDirectories))
+                Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
 
-            //string[] files = Directory.GetFiles(sourcePath);
-            string[] files = Directory.GetFileSystemEntries(sourcePath);
+            //Copy all the files & Replaces any files with the same name
+            foreach (string newPath in Directory.GetFiles(sourcePath, "*.*",
+                SearchOption.AllDirectories))
+                File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
+
+            //Getting all files of the directory.
+            string[] files = Directory.GetFiles(sourcePath);
+            //Iterating files.
             foreach (string f in files)
             {
                 sourceFile = Path.GetFileName(f);
