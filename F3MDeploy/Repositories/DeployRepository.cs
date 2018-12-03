@@ -61,11 +61,11 @@ namespace F3MDeploy.Repositories
             //}
 
             //Copying and overwriting files to the destination folder.
-            string[] directories = Directory.GetDirectories(sourcePath);
-            foreach(string d in directories)
-            {
-                Directory.c
-            }
+            //string[] directories = Directory.GetDirectories(sourcePath);
+            //foreach(string d in directories)
+            //{
+            //    Directory.
+            //}
 
             //string[] files = Directory.GetFiles(sourcePath);
             string[] files = Directory.GetFileSystemEntries(sourcePath);
